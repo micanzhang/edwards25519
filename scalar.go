@@ -169,6 +169,19 @@ func (s *Scalar) SetCanonicalBytes(x []byte) (*Scalar, error) {
 	return s, nil
 }
 
+// SetCanonicalBytesWithoutReduceCheck sets s = x, where x is a 32-byte little-endian encoding of
+// s, and returns s.
+func (s *Scalar) SetCanonicalBytesWithoutReduceCheck(x []byte) (*Scalar, error) {
+	if len(x) != 32 {
+		return nil, errors.New("invalid scalar length")
+	}
+
+	fiatScalarFromBytes((*[4]uint64)(&s.s), (*[32]byte)(x))
+	fiatScalarToMontgomery(&s.s, (*fiatScalarNonMontgomeryDomainFieldElement)(&s.s))
+
+	return s, nil
+}
+
 // scalarMinusOneBytes is l - 1 in little endian.
 var scalarMinusOneBytes = [32]byte{236, 211, 245, 92, 26, 99, 18, 88, 214, 156, 247, 162, 222, 249, 222, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 16}
 
